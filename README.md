@@ -33,7 +33,7 @@ python -m pip install --user aws-whoami
 
 ## Options
 
-`aws-whoami` uses [`boto3`](boto3.amazonaws.com/v1/documentation/api/latest/index.html), so it'll pick up your credentials in the normal ways,
+`aws-whoami` uses [`boto3`](boto3.amazonaws.com/v1/documentation/api/latest/index.html), so it'll pick up your credentials in [the normal ways](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#config-settings-and-precedence),
 including with the `--profile` parameter.
 
 If you'd like the output as a JSON object, that's the `--json` flag.
