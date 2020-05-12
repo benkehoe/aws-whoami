@@ -16,7 +16,7 @@ Arn:             arn:aws:sts::123456789012:assumed-role/MY-ROLE/ben
 UserId:          SOMEOPAQUEID:ben
 ```
 
-Note: if you don't have permissions to [iam:GetAccountAliases](https://docs.aws.amazon.com/IAM/latest/APIReference/API_ListAccountAliases.html),
+Note: if you don't have permissions to [iam:ListAccountAliases](https://docs.aws.amazon.com/IAM/latest/APIReference/API_ListAccountAliases.html),
 your account alias won't appear.
 
 ## Install
