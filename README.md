@@ -28,7 +28,7 @@ I recommend you install [`pipx`](https://pipxproject.github.io/pipx/), which ins
 pipx install aws-whoami
 
 # without pipx
-python3 -m pip install --user aws-whoami
+python -m pip install --user aws-whoami
 ```
 
 ## Options
