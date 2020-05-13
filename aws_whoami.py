@@ -22,6 +22,8 @@ import sys
 import boto3
 from botocore.exceptions import ClientError
 
+__version__ = '0.1.1'
+
 WhoamiInfo = namedtuple('WhoamiInfo', [
     'Account',
     'AccountAliases',
@@ -45,7 +47,13 @@ def main():
 
     parser.add_argument('--json', action='store_true', help="Output as JSON")
 
+    parser.add_argument('--version', action='store_true')
+
     args = parser.parse_args()
+
+    if args.version:
+        print(__version__)
+        parser.exit()
 
     try:
         session = boto3.Session(profile_name=args.profile)
@@ -55,12 +63,12 @@ def main():
         if args.json:
             print(json.dumps(whoami_info._asdict()))
         else:
-            print(_format_whoami(whoami_info))
+            print(format_whoami(whoami_info))
     except ClientError as e:
         sys.stderr.write('{}\n'.format(e))
         sys.exit(1)
 
-def _format_whoami(whoami_info):
+def format_whoami(whoami_info):
     lines = []
     lines.append(('Account: ', whoami_info.Account))
     for alias in whoami_info.AccountAliases:
