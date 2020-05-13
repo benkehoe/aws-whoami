@@ -2,8 +2,7 @@
 **Show what AWS account and identity you're using**
 
 You should know about [`aws sts get-caller-identity`](https://docs.aws.amazon.com/cli/latest/reference/sts/get-caller-identity.html),
-which sensibly returns the identity of the caller. But even if you've got the
-[AWS CLI v2](https://aws.amazon.com/blogs/developer/aws-cli-v2-is-now-generally-available/) and `--output yaml`, I find this a bit lacking.
+which sensibly returns the identity of the caller. But even with `--output table`, I find this a bit lacking.
 That ARN is a lot to visually parse, and I am not very good at remembering AWS account numbers. `aws-whoami` makes it better.
 
 ```
