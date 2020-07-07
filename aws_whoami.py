@@ -18,11 +18,12 @@ import argparse
 from collections import namedtuple
 import json
 import sys
+import traceback
 
 import boto3
 from botocore.exceptions import ClientError
 
-__version__ = '0.1.1'
+__version__ = '0.2.0'
 
 WhoamiInfo = namedtuple('WhoamiInfo', [
     'Account',
@@ -32,6 +33,7 @@ WhoamiInfo = namedtuple('WhoamiInfo', [
     'Name',
     'RoleSessionName',
     'UserId',
+    'Region',
 ])
 
 DESCRIPTION = """\
@@ -49,6 +51,8 @@ def main():
 
     parser.add_argument('--version', action='store_true')
 
+    parser.add_argument('--debug', action='store_true')
+
     args = parser.parse_args()
 
     if args.version:
@@ -64,8 +68,14 @@ def main():
             print(json.dumps(whoami_info._asdict()))
         else:
             print(format_whoami(whoami_info))
-    except ClientError as e:
-        sys.stderr.write('{}\n'.format(e))
+    except Exception as e:
+        if args.debug:
+            traceback.print_exc()
+        err_cls = type(e)
+        err_cls_str = err_cls.__name__
+        if err_cls.__module__ != 'builtins':
+            err_cls_str = '{}.{}'.format(err_cls.__module__, err_cls_str)
+        sys.stderr.write('ERROR [{}]: {}\n'.format(err_cls_str, e))
         sys.exit(1)
 
 def format_whoami(whoami_info):
@@ -73,11 +83,13 @@ def format_whoami(whoami_info):
     lines.append(('Account: ', whoami_info.Account))
     for alias in whoami_info.AccountAliases:
         lines.append(('', alias))
-    lines.append(("{}: ".format(whoami_info.Type), whoami_info.Name))
+    lines.append(('Region: ', whoami_info.Region))
+    type_str = ''.join(p[0].upper() + p[1:] for p in whoami_info.Type.split('-'))
+    lines.append(('{}: '.format(type_str), whoami_info.Name))
     if whoami_info.RoleSessionName:
         lines.append(('RoleSessionName: ', whoami_info.RoleSessionName))
-    lines.append(('Arn: ', whoami_info.Arn))
     lines.append(('UserId: ', whoami_info.UserId))
+    lines.append(('Arn: ', whoami_info.Arn))
     max_len = max(len(l[0]) for l in lines)
     return '\n'.join("{}{}".format(l[0].ljust(max_len), l[1]) for l in lines)
 
@@ -85,6 +97,7 @@ def whoami(session=None):
     session = session or boto3.Session()
 
     data = {}
+    data['Region'] = session.region_name
 
     response = session.client('sts').get_caller_identity()
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aws-whoami"
-version = "0.1.1"
+version = "0.2.0"
 description = "A tool to show what AWS account and identity you're using"
 authors = ["Ben Kehoe <ben@kehoe.io>"]
 license = "Apache-2.0"
