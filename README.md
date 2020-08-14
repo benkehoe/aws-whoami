@@ -3,7 +3,8 @@
 
 You should know about [`aws sts get-caller-identity`](https://docs.aws.amazon.com/cli/latest/reference/sts/get-caller-identity.html),
 which sensibly returns the identity of the caller. But even with `--output table`, I find this a bit lacking.
-That ARN is a lot to visually parse, and I am not very good at remembering AWS account numbers. `aws-whoami` makes it better.
+That ARN is a lot to visually parse, it doesn't tell you what region you're configured to use, and I am not very good at remembering AWS account numbers.
+`aws-whoami` makes it better.
 
 ```
 $ aws-whoami
@@ -21,7 +22,7 @@ your account alias won't appear.
 
 ## Install
 
-I recommend you install [`pipx`](https://pipxproject.github.io/pipx/), which installs the tool in an isolated virtualenv while linking the script you need.
+I recommend you install `aws-whoami` with [`pipx`](https://pipxproject.github.io/pipx/), which installs the tool in an isolated virtualenv while linking the script you need.
 
 ```bash
 # with pipx
