@@ -9,10 +9,11 @@ That ARN is a lot to visually parse, and I am not very good at remembering AWS a
 $ aws-whoami
 Account:         123456789012
                  my-account-alias
-assumed-role:    MY-ROLE
+Region:          us-east-2
+AssumedRole:     MY-ROLE
 RoleSessionName: ben
-Arn:             arn:aws:sts::123456789012:assumed-role/MY-ROLE/ben
 UserId:          SOMEOPAQUEID:ben
+Arn:             arn:aws:sts::123456789012:assumed-role/MY-ROLE/ben
 ```
 
 Note: if you don't have permissions to [iam:ListAccountAliases](https://docs.aws.amazon.com/IAM/latest/APIReference/API_ListAccountAliases.html),
