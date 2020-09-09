@@ -23,7 +23,7 @@ import traceback
 import boto3
 from botocore.exceptions import ClientError
 
-__version__ = '0.2.0'
+__version__ = '0.2.2'
 
 WhoamiInfo = namedtuple('WhoamiInfo', [
     'Account',
@@ -110,6 +110,7 @@ def whoami(session=None):
         data['Name'], data['RoleSessionName'] = name.rsplit('/', 1)
     else:
         data['Name'] = name
+        data['RoleSessionName'] = None
 
     data['AccountAliases'] = []
     try:
