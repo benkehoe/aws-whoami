@@ -105,6 +105,7 @@ def whoami(session=None):
         data[field] = response[field]
 
     data['Type'], name = data['Arn'].rsplit(':', 1)[1].split('/',1)
+    data['RoleSessionName'] = ""
 
     if data['Type'] == 'assumed-role':
         data['Name'], data['RoleSessionName'] = name.rsplit('/', 1)
