@@ -11,10 +11,10 @@ $ aws-whoami
 Account:         123456789012
                  my-account-alias
 Region:          us-east-2
-assumed-role:    MY-ROLE
+AssumedRole:     MY-ROLE
 RoleSessionName: ben
-Arn:             arn:aws:sts::123456789012:assumed-role/MY-ROLE/ben
 UserId:          SOMEOPAQUEID:ben
+Arn:             arn:aws:sts::123456789012:assumed-role/MY-ROLE/ben
 ```
 
 Note: if you don't have permissions to [iam:ListAccountAliases](https://docs.aws.amazon.com/IAM/latest/APIReference/API_ListAccountAliases.html),
@@ -22,7 +22,7 @@ your account alias won't appear.
 
 ## Install
 
-I recommend you install [`pipx`](https://pipxproject.github.io/pipx/), which installs the tool in an isolated virtualenv while linking the script you need.
+I recommend you install `aws-whoami` with [`pipx`](https://pipxproject.github.io/pipx/), which installs the tool in an isolated virtualenv while linking the script you need.
 
 ```bash
 # with pipx
