@@ -12,18 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Utility for determining what AWS account and identity you're using."""
+
 from __future__ import print_function
 
 import argparse
 from collections import namedtuple
 import json
 import sys
+import os
 import traceback
 
 import boto3
 from botocore.exceptions import ClientError
 
-__version__ = '0.2.2'
+__version__ = '1.0.0'
 
 WhoamiInfo = namedtuple('WhoamiInfo', [
     'Account',
@@ -62,7 +65,15 @@ def main():
     try:
         session = boto3.Session(profile_name=args.profile)
 
-        whoami_info = whoami(session)
+        disable_account_alias = os.environ.get('AWS_WHOAMI_DISABLE_ACCOUNT_ALIAS', '')
+        if disable_account_alias.lower() in ['', '0', 'false']:
+            disable_account_alias = False
+        elif disable_account_alias.lower() in ['1', 'true']:
+            disable_account_alias = True
+        else:
+            disable_account_alias = disable_account_alias.split(',')
+
+        whoami_info = whoami(session=session, disable_account_alias=disable_account_alias)
 
         if args.json:
             print(json.dumps(whoami_info._asdict()))
@@ -93,7 +104,8 @@ def format_whoami(whoami_info):
     max_len = max(len(l[0]) for l in lines)
     return '\n'.join("{}{}".format(l[0].ljust(max_len), l[1]) for l in lines)
 
-def whoami(session=None):
+def whoami(session=None, disable_account_alias=False):
+    """Session must be a boto3 Session"""
     session = session or boto3.Session()
 
     data = {}
@@ -113,14 +125,24 @@ def whoami(session=None):
         data['RoleSessionName'] = None
 
     data['AccountAliases'] = []
-    try:
-        #pedantry
-        paginator = session.client('iam').get_paginator('list_account_aliases')
-        for response in paginator.paginate():
-            data['AccountAliases'].extend(response['AccountAliases'])
-    except ClientError as e:
-        if e.response.get('Error', {}).get('Code') != 'AccessDenied':
-            raise
+    if not isinstance(disable_account_alias, bool):
+        for value in disable_account_alias:
+            if data['Account'].startswith(value) or data['Account'].endswith(value):
+                disable_account_alias = True
+                break
+            fields = ['Name', 'Arn', 'RoleSessionName']
+            if any(value == data[field] for field in fields):
+                disable_account_alias = True
+                break
+    if not disable_account_alias:
+        try:
+            #pedantry
+            paginator = session.client('iam').get_paginator('list_account_aliases')
+            for response in paginator.paginate():
+                data['AccountAliases'].extend(response['AccountAliases'])
+        except ClientError as e:
+            if e.response.get('Error', {}).get('Code') != 'AccessDenied':
+                raise
 
     return WhoamiInfo(**data)
 

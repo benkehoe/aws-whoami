@@ -18,7 +18,7 @@ Arn:             arn:aws:sts::123456789012:assumed-role/MY-ROLE/ben
 ```
 
 Note: if you don't have permissions to [iam:ListAccountAliases](https://docs.aws.amazon.com/IAM/latest/APIReference/API_ListAccountAliases.html),
-your account alias won't appear.
+your account alias won't appear. See below for disabling this check if getting a permission denied on this call raises flags in your organization.
 
 ## Install
 
@@ -32,6 +32,8 @@ pipx install aws-whoami
 python -m pip install --user aws-whoami
 ```
 
+If you don't want to install it, the `aws_whoami.py` file can be used on its own, with only a dependency on `boto3`.
+
 ## Options
 
 `aws-whoami` uses [`boto3`](boto3.amazonaws.com/v1/documentation/api/latest/index.html), so it'll pick up your credentials in [the normal ways](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#config-settings-and-precedence),
@@ -39,7 +41,29 @@ including with the `--profile` parameter.
 
 If you'd like the output as a JSON object, that's the `--json` flag.
 
-## Other uses
-If you don't want to install it, the `aws_whoami.py` file can be used on its own, with only a dependency on `boto3`.
+To full disable account alias checking, set the environment variable `AWS_WHOAMI_DISABLE_ACCOUNT_ALIAS` to `true`.
+To selectively disable it, you can also set it to a comma-separated list of values that will be matched against the following:
+* The beginning or end of the account number
+* The principal Name or ARN
+* The role session name
 
-If you want to use it as a library, the `whoami()` function, which optionally takes a `boto3.Session`, returns a `WhoamiInfo` namedtuple.
+## As a library
+
+The library has a `whoami()` function, which optionally takes a `boto3.Session`, and returns a `WhoamiInfo` namedtuple.
+
+The fields of `WhoamiInfo` are:
+* Account
+* AccountAliases (NOTE: this is a list)
+* Arn
+* Type
+* Name
+* RoleSessionName
+* UserId
+* Region
+
+`Type`, `Name`, and `RoleSessionName` are split from the ARN for convenience. `RoleSessionName` is `None` for IAM users.
+
+To disable the account alias check, pass `disable_account_alias=True` to `whoami()`.
+Note that the `AccountAliases` field will then be an empty list, not `None`.
+
+`format_whoami()` takes a `WhoamiInfo` object and returns the formatted string used for display.
