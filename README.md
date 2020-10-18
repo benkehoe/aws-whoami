@@ -32,7 +32,7 @@ pipx install aws-whoami
 python -m pip install --user aws-whoami
 ```
 
-If you don't want to install it, the `aws_whoami.py` file can be used on its own, with only a dependency on `boto3`.
+If you don't want to install it, the `aws_whoami.py` file can be used on its own, with only a dependency on `botocore` (which comes with `boto3`).
 
 ## Options
 
@@ -49,7 +49,7 @@ To selectively disable it, you can also set it to a comma-separated list of valu
 
 ## As a library
 
-The library has a `whoami()` function, which optionally takes a `boto3.Session`, and returns a `WhoamiInfo` namedtuple.
+The library has a `whoami()` function, which optionally takes a `Session` (either `boto3` or `botocore`), and returns a `WhoamiInfo` namedtuple.
 
 The fields of `WhoamiInfo` are:
 * Account

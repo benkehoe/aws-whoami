@@ -23,10 +23,11 @@ import sys
 import os
 import traceback
 
-import boto3
+import botocore
+import botocore.session
 from botocore.exceptions import ClientError
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 
 WhoamiInfo = namedtuple('WhoamiInfo', [
     'Account',
@@ -63,7 +64,7 @@ def main():
         parser.exit()
 
     try:
-        session = boto3.Session(profile_name=args.profile)
+        session = botocore.session.Session(profile=args.profile)
 
         disable_account_alias = os.environ.get('AWS_WHOAMI_DISABLE_ACCOUNT_ALIAS', '')
         if disable_account_alias.lower() in ['', '0', 'false']:
@@ -105,13 +106,25 @@ def format_whoami(whoami_info):
     return '\n'.join("{}{}".format(l[0].ljust(max_len), l[1]) for l in lines)
 
 def whoami(session=None, disable_account_alias=False):
-    """Session must be a boto3 Session"""
-    session = session or boto3.Session()
+    """Return a WhoamiInfo namedtuple.
+
+    Args:
+        session: An optional boto3 or botocore Session
+        disable_account_alias (bool): Disable checking the account alias
+
+    Returns:
+        WhoamiInfo: Data on the current IAM principal, account, and region.
+
+    """
+    if session is None:
+        session = botocore.session.get_session()
+    elif hasattr(session, '_session'):
+        session = session._session
 
     data = {}
-    data['Region'] = session.region_name
+    data['Region'] = session.get_config_variable('region')
 
-    response = session.client('sts').get_caller_identity()
+    response = session.create_client('sts').get_caller_identity()
 
     for field in ['Account', 'Arn', 'UserId']:
         data[field] = response[field]
@@ -137,7 +150,7 @@ def whoami(session=None, disable_account_alias=False):
     if not disable_account_alias:
         try:
             #pedantry
-            paginator = session.client('iam').get_paginator('list_account_aliases')
+            paginator = session.create_client('iam').get_paginator('list_account_aliases')
             for response in paginator.paginate():
                 data['AccountAliases'].extend(response['AccountAliases'])
         except ClientError as e:
