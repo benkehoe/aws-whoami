@@ -27,7 +27,7 @@ import botocore
 import botocore.session
 from botocore.exceptions import ClientError
 
-__version__ = '1.1.0'
+__version__ = '1.2.0'
 
 WhoamiInfo = namedtuple('WhoamiInfo', [
     'Account',
@@ -38,6 +38,7 @@ WhoamiInfo = namedtuple('WhoamiInfo', [
     'RoleSessionName',
     'UserId',
     'Region',
+    'SSOPermissionSet',
 ])
 
 DESCRIPTION = """\
@@ -96,8 +97,11 @@ def format_whoami(whoami_info):
     for alias in whoami_info.AccountAliases:
         lines.append(('', alias))
     lines.append(('Region: ', whoami_info.Region))
-    type_str = ''.join(p[0].upper() + p[1:] for p in whoami_info.Type.split('-'))
-    lines.append(('{}: '.format(type_str), whoami_info.Name))
+    if whoami_info.SSOPermissionSet:
+        lines.append(('AWS SSO: ', whoami_info.SSOPermissionSet))
+    else:
+        type_str = ''.join(p[0].upper() + p[1:] for p in whoami_info.Type.split('-'))
+        lines.append(('{}: '.format(type_str), whoami_info.Name))
     if whoami_info.RoleSessionName:
         lines.append(('RoleSessionName: ', whoami_info.RoleSessionName))
     lines.append(('UserId: ', whoami_info.UserId))
@@ -118,7 +122,7 @@ def whoami(session=None, disable_account_alias=False):
     """
     if session is None:
         session = botocore.session.get_session()
-    elif hasattr(session, '_session'):
+    elif hasattr(session, '_session'): # allow boto3 Session as well
         session = session._session
 
     data = {}
@@ -136,6 +140,15 @@ def whoami(session=None, disable_account_alias=False):
     else:
         data['Name'] = name
         data['RoleSessionName'] = None
+
+    if data['Type'] == 'assumed-role' and data['Name'].startswith('AWSReservedSSO'):
+        try:
+            # format is AWSReservedSSO_{permission-set}_{random-tag}
+            data['SSOPermissionSet'] = data['Name'].split('_', 1)[1].rsplit('_', 1)[0]
+        except Exception as e:
+            data['SSOPermissionSet'] = None
+    else:
+        data['SSOPermissionSet'] = None
 
     data['AccountAliases'] = []
     if not isinstance(disable_account_alias, bool):

@@ -40,6 +40,7 @@ If you don't want to install it, the `aws_whoami.py` file can be used on its own
 including with the `--profile` parameter.
 
 If you'd like the output as a JSON object, that's the `--json` flag.
+The output is the `WhoamiInfo` object (see below) as a JSON object.
 
 To full disable account alias checking, set the environment variable `AWS_WHOAMI_DISABLE_ACCOUNT_ALIAS` to `true`.
 To selectively disable it, you can also set it to a comma-separated list of values that will be matched against the following:
@@ -52,16 +53,20 @@ To selectively disable it, you can also set it to a comma-separated list of valu
 The library has a `whoami()` function, which optionally takes a `Session` (either `boto3` or `botocore`), and returns a `WhoamiInfo` namedtuple.
 
 The fields of `WhoamiInfo` are:
-* Account
-* AccountAliases (NOTE: this is a list)
-* Arn
-* Type
-* Name
-* RoleSessionName
-* UserId
-* Region
+* `Account`
+* `AccountAliases` (NOTE: this is a list)
+* `Arn`
+* `Type`
+* `Name`
+* `RoleSessionName`
+* `UserId`
+* `Region`
+* `SSOPermissionSet`
 
-`Type`, `Name`, and `RoleSessionName` are split from the ARN for convenience. `RoleSessionName` is `None` for IAM users.
+`Type`, `Name`, and `RoleSessionName` (and `SSOPermissionSet`) are split from the ARN for convenience.
+`RoleSessionName` is `None` for IAM users.
+
+`SSOPermissionSet` is set if the assumed role name conforms to the format `AWSReservedSSO_{permission-set}_{random-tag}`.
 
 To disable the account alias check, pass `disable_account_alias=True` to `whoami()`.
 Note that the `AccountAliases` field will then be an empty list, not `None`.
