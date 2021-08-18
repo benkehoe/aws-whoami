@@ -32,7 +32,7 @@ pipx install aws-whoami
 python -m pip install --user aws-whoami
 ```
 
-If you don't want to install it, the `aws_whoami.py` file can be used on its own, with only a dependency on `botocore` (which comes with `boto3`).
+If you don't want to install it, the [`aws_whoami.py`](https://raw.githubusercontent.com/benkehoe/aws-whoami/master/aws_whoami.py) file can be used on its own, with only a dependency on `botocore` (which comes with `boto3`).
 
 ## Options
 
