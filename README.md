@@ -1,6 +1,8 @@
 # aws-whoami
 **Show what AWS account and identity you're using**
 
+> :warning: The `aws-whoami` CLI tool is [now implemented in Go](https://github.com/benkehoe/aws-whoami-golang), and the Python version is unmaintained as a CLI tool. It can still be used as a library.
+
 You should know about [`aws sts get-caller-identity`](https://docs.aws.amazon.com/cli/latest/reference/sts/get-caller-identity.html),
 which sensibly returns the identity of the caller. But even with `--output table`, I find this a bit lacking.
 That ARN is a lot to visually parse, it doesn't tell you what region your credentials are configured for,
